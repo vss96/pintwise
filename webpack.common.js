@@ -1,5 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
+require('dotenv').config();
+require('dotenv').config();
 
 module.exports = {
   entry: {
@@ -12,7 +14,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.SQLITE_CONNECTION_STRING': JSON.stringify(process.env.SQLITE_CONNECTION_STRING || ''),
+      'process.env.SQLITE_CONNECTION_STRING': JSON.stringify(process.env.SQLITE_CONNECTION_STRING || null),
     }),
   ],
 };

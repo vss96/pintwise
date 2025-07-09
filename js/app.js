@@ -2,6 +2,9 @@
  * Pintwise - Main Application Logic
  */
 
+// Import database module
+import './database.js';
+
 class PintApp {
   constructor() {
     this.db = new PintDatabase();
@@ -12,29 +15,39 @@ class PintApp {
 
   async init() {
     try {
+      // Setup event listeners first (before database operations)
+      this.setupEventListeners();
+
       // Initialize database
       await this.db.initializeDatabase();
-
-      // Setup event listeners
-      this.setupEventListeners();
 
       // Load initial data
       await this.loadData();
 
       // Show initial view
       this.showView('pending');
-
-      console.log('Pintwise app initialized successfully');
     } catch (error) {
       console.error('Failed to initialize app:', error);
-      this.showError('Failed to initialize app. Please check your connection.');
+
+      // Even if database fails, set up event listeners so navigation works
+      try {
+        this.setupEventListeners();
+        this.showView('pending');
+      } catch (fallbackError) {
+        console.error('Critical error - even fallback failed:', fallbackError);
+      }
+
+      this.showError('Failed to initialize app. Running in limited mode.');
     }
   }
 
   setupEventListeners() {
     // Navigation
-    document.querySelectorAll('.nav-btn').forEach(btn => {
+    const navButtons = document.querySelectorAll('.nav-btn');
+
+    navButtons.forEach((btn, index) => {
       btn.addEventListener('click', (e) => {
+        e.preventDefault();
         const view = e.target.dataset.view;
         this.showView(view);
       });
@@ -62,6 +75,7 @@ class PintApp {
   async loadData() {
     try {
       this.showLoading(true);
+      // Always load all entries for stats and balances calculation
       this.allEntries = await this.db.getAllPints();
       this.updateCurrentView();
       this.updateStats();
@@ -75,13 +89,16 @@ class PintApp {
 
   showView(viewName) {
     // Update navigation
-    document.querySelectorAll('.nav-btn').forEach(btn => {
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
       btn.classList.toggle('active', btn.dataset.view === viewName);
     });
 
     // Update view content
-    document.querySelectorAll('.view').forEach(view => {
-      view.classList.toggle('hidden', !view.classList.contains(`${viewName}-view`));
+    const views = document.querySelectorAll('.view');
+    views.forEach(view => {
+      const shouldShow = view.classList.contains(`${viewName}-view`);
+      view.classList.toggle('hidden', !shouldShow);
     });
 
     this.currentView = viewName;
