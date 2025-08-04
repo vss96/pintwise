@@ -1,174 +1,77 @@
 /**
- * Database layer for SQLite Cloud integration
+ * Database layer for PostgreSQL integration via Supabase
  */
 
-// Import SQLite Cloud driver
-import { Database } from '@sqlitecloud/drivers';
+// Import Supabase client
+import { createClient } from '@supabase/supabase-js';
 
 class PintDatabase {
   constructor() {
-    this.connectionString = process.env.SQLITE_CONNECTION_STRING;
-
-    if (!this.connectionString) {
-      throw new Error('SQLITE_CONNECTION_STRING environment variable is required');
+    this.supabaseUrl = process.env.SUPABASE_URL;
+    this.supabaseKey = process.env.SUPABASE_ANON_KEY;
+    if (!this.supabaseUrl || !this.supabaseKey) {
+      throw new Error('Supabase URL and anon key are required');
     }
-
-    // Initialize SQLite Cloud database connection
-    this.db = new Database(this.connectionString);
-  }
-
-
-
-
-
-  async executeQuery(sql, params = []) {
-    try {
-      let result;
-
-      // Use the official SQLite Cloud driver syntax from documentation
-      if (params && params.length > 0) {
-        // For parameterized queries, pass SQL and parameters separately
-        result = await this.db.sql(sql, ...params);
-      } else {
-        // For simple queries without parameters
-        result = await this.db.sql(sql);
-      }
-
-      return result;
-    } catch (error) {
-      console.error('Database query failed:', error);
-      throw error;
-    }
-  }
-
-
-
-  async initializeDatabase() {
-    const createTableSQL = `
-      CREATE TABLE IF NOT EXISTS pint_entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        debtor TEXT NOT NULL,
-        creditor TEXT NOT NULL,
-        description TEXT,
-        amount REAL DEFAULT 1.0,
-        date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        date_paid DATETIME,
-        status TEXT DEFAULT 'pending'
-      )
-    `;
-
-    try {
-      await this.executeQuery(createTableSQL);
-    } catch (error) {
-      console.error('Failed to initialize database:', error);
-      throw error;
-    }
+    this.supabase = createClient(this.supabaseUrl, this.supabaseKey);
   }
 
   async addPintEntry(debtor, creditor, description = '', amount = 1.0) {
-    const sql = `
-      INSERT INTO pint_entries (debtor, creditor, description, amount)
-      VALUES (?, ?, ?, ?)
-    `;
+    console.log('Adding pint entry:', { debtor, creditor, description, amount });
+    const { data, error } = await this.supabase
+      .from('pint_entries')
+      .insert([{
+        debtor,
+        creditor,
+        description,
+        amount,
+        status: 'pending'
+      }])
+      .select();
 
-    try {
-      const result = await this.executeQuery(sql, [debtor, creditor, description, amount]);
-      return result.lastInsertRowid;
-    } catch (error) {
-      console.error('Failed to add pint entry:', error);
+    if (error) {
+      console.error('Insert error:', error);
       throw error;
     }
+
+    console.log('Insert successful:', data);
+    return data[0]?.id;
   }
 
   async getPendingPints() {
-    const sql = `
-      SELECT * FROM pint_entries
-      WHERE status = 'pending'
-      ORDER BY date_created DESC
-    `;
-
-    try {
-      return await this.executeQuery(sql);
-    } catch (error) {
-      console.error('Failed to get pending pints:', error);
-      throw error;
-    }
+    const { data, error } = await this.supabase
+      .from('pint_entries')
+      .select('*')
+      .eq('status', 'pending')
+      .order('date_created', { ascending: false });
+    if (error) throw error;
+    return data;
   }
 
   async getAllPints() {
-    const sql = `
-      SELECT * FROM pint_entries
-      ORDER BY date_created DESC
-    `;
-
-    try {
-      return await this.executeQuery(sql);
-    } catch (error) {
-      console.error('Failed to get all pints:', error);
-      throw error;
-    }
+    const { data, error } = await this.supabase
+      .from('pint_entries')
+      .select('*')
+      .order('date_created', { ascending: false });
+    if (error) throw error;
+    return data;
   }
 
   async markPintAsPaid(id) {
-    const sql = `
-      UPDATE pint_entries
-      SET status = 'paid', date_paid = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `;
-
-    try {
-      const result = await this.executeQuery(sql, [id]);
-
-      // Handle different possible return formats from SQLite Cloud driver
-      if (typeof result === 'object' && result !== null) {
-        // Check for various possible properties that indicate success
-        if (result.changes !== undefined) {
-          return result.changes > 0;
-        } else if (result.rowsAffected !== undefined) {
-          return result.rowsAffected > 0;
-        } else if (result.affectedRows !== undefined) {
-          return result.affectedRows > 0;
-        } else if (result.success !== undefined) {
-          return result.success;
-        }
-      }
-
-      // If we can't determine success from the result, assume it worked
-      // since the operation completed without throwing an error
-      return true;
-    } catch (error) {
-      console.error('Failed to mark pint as paid:', error);
-      throw error;
-    }
+    const { error } = await this.supabase
+      .from('pint_entries')
+      .update({ status: 'paid', date_paid: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+    return true;
   }
 
   async deletePintEntry(id) {
-    const sql = `DELETE FROM pint_entries WHERE id = ?`;
-
-    try {
-      const result = await this.executeQuery(sql, [id]);
-
-      // Handle different possible return formats from SQLite Cloud driver
-      if (typeof result === 'object' && result !== null) {
-        // Check for various possible properties that indicate success
-        if (result.changes !== undefined) {
-          return result.changes > 0;
-        } else if (result.rowsAffected !== undefined) {
-          return result.rowsAffected > 0;
-        } else if (result.affectedRows !== undefined) {
-          return result.affectedRows > 0;
-        } else if (result.success !== undefined) {
-          return result.success;
-        }
-      }
-
-      // If we can't determine success from the result, assume it worked
-      // since the operation completed without throwing an error
-      return true;
-    } catch (error) {
-      console.error('Failed to delete pint entry:', error);
-      throw error;
-    }
+    const { error } = await this.supabase
+      .from('pint_entries')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
   }
 
   calculateNetBalances(entries) {

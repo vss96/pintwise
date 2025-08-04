@@ -18,9 +18,6 @@ class PintApp {
       // Setup event listeners first (before database operations)
       this.setupEventListeners();
 
-      // Initialize database
-      await this.db.initializeDatabase();
-
       // Load initial data
       await this.loadData();
 

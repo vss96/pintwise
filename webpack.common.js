@@ -14,7 +14,8 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.SQLITE_CONNECTION_STRING': JSON.stringify(process.env.SQLITE_CONNECTION_STRING || null),
+      'process.env.SUPABASE_URL': JSON.stringify(process.env.SUPABASE_URL || null),
+      'process.env.SUPABASE_ANON_KEY': JSON.stringify(process.env.SUPABASE_ANON_KEY || null),
     }),
   ],
 };

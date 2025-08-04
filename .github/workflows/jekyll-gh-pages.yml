@@ -41,7 +41,8 @@ jobs:
       - name: Build webpack assets
         run: npm run build
         env:
-          SQLITE_CONNECTION_STRING: ${{ secrets.SQLITE_CONNECTION_STRING }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

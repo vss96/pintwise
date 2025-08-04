@@ -1,15 +1,15 @@
 # 🍺 Pintwise - Pint Debt Tracker
 
-A simple, elegant web application to track pints owed between friends. Built for GitHub Pages with SQLite Cloud integration.
+A simple, elegant web application to track pints owed between friends. Built with Supabase (PostgreSQL) backend.
 
 ## Features
 
 - **Track Pint Debts**: Record who owes pints to whom
-- **Real-time Updates**: Changes are saved automatically to SQLite Cloud
+- **Real-time Updates**: Changes are saved automatically to Supabase
 - **Net Balance Calculator**: See consolidated debts between people
 - **Search & Filter**: Find specific entries or people quickly
 - **Responsive Design**: Works perfectly on mobile and desktop
-- **Offline Demo Mode**: Works even without database connection
+- **Scrollable Lists**: Handle large numbers of entries with smooth scrolling
 
 ## Live Demo
 
@@ -30,19 +30,36 @@ cd pintwise
 npm install
 ```
 
-### 3. Set up SQLite Cloud Database
+### 3. Set up Supabase Database
 
-1. Sign up for [SQLite Cloud](https://sqlitecloud.io/)
-2. Create a new database
-3. Note your connection string (format: `sqlitecloud://xxx.sqlite.cloud:8860/database.sqlite?apikey=xxx`)
+1. Sign up for [Supabase](https://supabase.com/)
+2. Create a new project
+3. Go to Settings → API to get your project URL and anon key
+4. In the SQL Editor, create the required table:
+
+```sql
+CREATE TABLE pint_entries (
+    id BIGSERIAL PRIMARY KEY,
+    debtor TEXT NOT NULL,
+    creditor TEXT NOT NULL,
+    description TEXT,
+    amount DECIMAL(10,2) DEFAULT 1.0,
+    date_created TIMESTAMPTZ DEFAULT NOW(),
+    date_paid TIMESTAMPTZ,
+    status TEXT DEFAULT 'pending'
+);
+
+-- Disable Row Level Security for simplicity (or set up proper policies)
+ALTER TABLE pint_entries DISABLE ROW LEVEL SECURITY;
+```
 
 ### 4. Configure GitHub Secrets
 
 1. Go to your GitHub repository
 2. Navigate to Settings → Secrets and variables → Actions
-3. Add a new repository secret:
-   - **Name**: `SQLITE_CONNECTION_STRING`
-   - **Value**: Your SQLite Cloud connection string
+3. Add new repository secrets:
+   - **Name**: `SUPABASE_URL` - **Value**: Your Supabase project URL
+   - **Name**: `SUPABASE_ANON_KEY` - **Value**: Your Supabase anon key
 
 ### 5. Enable GitHub Pages
 
@@ -55,7 +72,8 @@ npm install
 For local development, create a `.env` file:
 
 ```bash
-SQLITE_CONNECTION_STRING=your_connection_string_here
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key_here
 ```
 
 Then run:
@@ -87,35 +105,28 @@ Use the search bar to find entries by:
 
 ## Database Schema
 
-The app uses a simple SQLite table:
+The app uses a PostgreSQL table in Supabase:
 
 ```sql
 CREATE TABLE pint_entries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     debtor TEXT NOT NULL,
     creditor TEXT NOT NULL,
     description TEXT,
-    amount REAL DEFAULT 1.0,
-    date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    date_paid DATETIME,
+    amount DECIMAL(10,2) DEFAULT 1.0,
+    date_created TIMESTAMPTZ DEFAULT NOW(),
+    date_paid TIMESTAMPTZ,
     status TEXT DEFAULT 'pending'
 );
 ```
 
-## Demo Mode
-
-If no database connection is available, the app automatically switches to demo mode using localStorage. This allows you to:
-- Test the application locally
-- Use it offline
-- Demonstrate features without a database
-
 ## Technology Stack
 
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
-- **Database**: SQLite Cloud
+- **Database**: Supabase (PostgreSQL)
 - **Build Tool**: Webpack
 - **Deployment**: GitHub Actions + GitHub Pages
-- **Styling**: Custom CSS with responsive design
+- **Styling**: Custom CSS with responsive design and scrollable lists
 
 ## Contributing
 
@@ -133,12 +144,12 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 If you encounter any issues:
 
-1. Check that your SQLite connection string is correct
-2. Ensure the GitHub secret is properly set
+1. Check that your Supabase URL and anon key are correct
+2. Ensure the GitHub secrets are properly set
 3. Verify that GitHub Pages is enabled
 4. Check the browser console for error messages
-
-For demo mode (localStorage), data persists only in the current browser.
+5. Make sure the `pint_entries` table exists in your Supabase database
+6. Verify that Row Level Security is disabled or proper policies are set
 
 ## Roadmap
 
