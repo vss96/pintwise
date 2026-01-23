@@ -5,7 +5,7 @@ name: Keep Supabase Alive
 on:
   # Run every 5 days at midnight UTC
   schedule:
-    - cron: '0 0 */5 * *'
+    - cron: '0 0 * * *'  
 
   # Allow manual trigger for testing
   workflow_dispatch:
