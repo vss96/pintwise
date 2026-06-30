@@ -15,7 +15,8 @@ export async function onRequestGet({ request, env }) {
     const { results } = await stmt.all();
     return json(results);
   } catch (err) {
-    return json({ error: err.message }, 500);
+    console.error('GET /api/pints failed:', err);
+    return json({ error: 'Internal server error' }, 500);
   }
 }
 
@@ -41,6 +42,7 @@ export async function onRequestPost({ request, env }) {
       .run();
     return json({ id: meta.last_row_id }, 201);
   } catch (err) {
-    return json({ error: err.message }, 500);
+    console.error('POST /api/pints failed:', err);
+    return json({ error: 'Internal server error' }, 500);
   }
 }

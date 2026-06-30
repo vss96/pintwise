@@ -16,7 +16,8 @@ export async function onRequestPatch({ params, env }) {
     if (meta.changes === 0) return json({ error: 'Not found' }, 404);
     return json({ success: true });
   } catch (err) {
-    return json({ error: err.message }, 500);
+    console.error('PATCH /api/pints/:id failed:', err);
+    return json({ error: 'Internal server error' }, 500);
   }
 }
 
@@ -30,6 +31,7 @@ export async function onRequestDelete({ params, env }) {
     if (meta.changes === 0) return json({ error: 'Not found' }, 404);
     return json({ success: true });
   } catch (err) {
-    return json({ error: err.message }, 500);
+    console.error('DELETE /api/pints/:id failed:', err);
+    return json({ error: 'Internal server error' }, 500);
   }
 }
