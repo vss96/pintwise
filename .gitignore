@@ -9,3 +9,6 @@ dist
 # Private data export + generated seed (never commit real debt data)
 data/
 migration-data.sql
+
+# wrangler local state
+.wrangler/
