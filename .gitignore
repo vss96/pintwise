@@ -5,3 +5,7 @@ node_modules
 dist
 .cache
 .env
+
+# Private data export + generated seed (never commit real debt data)
+data/
+migration-data.sql

@@ -1,0 +1,8 @@
+name = "pintwise"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pintwise"
+database_id = "71a046a7-55e1-4aa3-9aed-109637e7e910"
