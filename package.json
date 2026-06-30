@@ -14,18 +14,20 @@
   "scripts": {
     "test": "node --test scripts/",
     "start": "webpack serve --open --config webpack.config.dev.js",
-    "build": "webpack --config webpack.config.prod.js"
+    "build": "webpack --config webpack.config.prod.js",
+    "pages:dev": "npm run build && wrangler pages dev dist",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name=pintwise",
+    "db:apply": "wrangler d1 execute pintwise --remote --file=schema.sql",
+    "migrate:gen": "node scripts/json-to-d1-sql.mjs"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^11.0.0",
-    "dotenv": "^17.2.0",
     "html-webpack-plugin": "^5.6.0",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4",
-    "webpack-merge": "^5.10.0"
+    "webpack-merge": "^5.10.0",
+    "wrangler": "^4.0.0"
   },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.39.7"
-  }
+  "dependencies": {}
 }

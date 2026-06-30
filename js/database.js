@@ -1,76 +1,54 @@
 /**
- * Database layer for PostgreSQL integration via Supabase
+ * Database layer for Pintwise.
+ * Talks to same-origin Cloudflare Pages Functions backed by Cloudflare D1.
+ * No credentials in the client.
  */
-
-// Import Supabase client
-import { createClient } from '@supabase/supabase-js';
-
 class PintDatabase {
-  constructor() {
-    this.supabaseUrl = process.env.SUPABASE_URL;
-    this.supabaseKey = process.env.SUPABASE_ANON_KEY;
-    if (!this.supabaseUrl || !this.supabaseKey) {
-      throw new Error('Supabase URL and anon key are required');
+  constructor(baseUrl = '/api') {
+    this.baseUrl = baseUrl;
+  }
+
+  async _request(path, options = {}) {
+    const res = await fetch(`${this.baseUrl}${path}`, {
+      headers: { 'content-type': 'application/json' },
+      ...options,
+    });
+    if (!res.ok) {
+      let detail = '';
+      try {
+        detail = (await res.json()).error || '';
+      } catch {
+        /* non-JSON error body */
+      }
+      throw new Error(`Request failed (${res.status}) ${detail}`.trim());
     }
-    this.supabase = createClient(this.supabaseUrl, this.supabaseKey);
+    if (res.status === 204) return null;
+    return res.json();
   }
 
   async addPintEntry(debtor, creditor, description = '', amount = 1.0) {
-    console.log('Adding pint entry:', { debtor, creditor, description, amount });
-    const { data, error } = await this.supabase
-      .from('pint_entries')
-      .insert([{
-        debtor,
-        creditor,
-        description,
-        amount,
-        status: 'pending'
-      }])
-      .select();
-
-    if (error) {
-      console.error('Insert error:', error);
-      throw error;
-    }
-
-    console.log('Insert successful:', data);
-    return data[0]?.id;
+    const data = await this._request('/pints', {
+      method: 'POST',
+      body: JSON.stringify({ debtor, creditor, description, amount }),
+    });
+    return data?.id;
   }
 
   async getPendingPints() {
-    const { data, error } = await this.supabase
-      .from('pint_entries')
-      .select('*')
-      .eq('status', 'pending')
-      .order('date_created', { ascending: false });
-    if (error) throw error;
-    return data;
+    return this._request('/pints?status=pending');
   }
 
   async getAllPints() {
-    const { data, error } = await this.supabase
-      .from('pint_entries')
-      .select('*')
-      .order('date_created', { ascending: false });
-    if (error) throw error;
-    return data;
+    return this._request('/pints');
   }
 
   async markPintAsPaid(id) {
-    const { error } = await this.supabase
-      .from('pint_entries')
-      .update({ status: 'paid', date_paid: new Date().toISOString() })
-      .eq('id', id);
-    if (error) throw error;
+    await this._request(`/pints/${id}`, { method: 'PATCH' });
     return true;
   }
 
   async deletePintEntry(id) {
-    const { error } = await this.supabase
-      .from('pint_entries')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await this._request(`/pints/${id}`, { method: 'DELETE' });
     return true;
   }
 
