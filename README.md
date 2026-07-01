@@ -1,11 +1,11 @@
 # 🍺 Pintwise - Pint Debt Tracker
 
-A simple, elegant web application to track pints owed between friends. Built with Supabase (PostgreSQL) backend.
+A simple, elegant web application to track pints owed between friends. Built on
+Cloudflare Pages with a Pages Functions API backed by Cloudflare D1 (SQLite).
 
 ## Features
 
 - **Track Pint Debts**: Record who owes pints to whom
-- **Real-time Updates**: Changes are saved automatically to Supabase
 - **Net Balance Calculator**: See consolidated debts between people
 - **Search & Filter**: Find specific entries or people quickly
 - **Responsive Design**: Works perfectly on mobile and desktop
@@ -13,74 +13,76 @@ A simple, elegant web application to track pints owed between friends. Built wit
 
 ## Live Demo
 
-Visit the live application: [Your GitHub Pages URL]
+- Production: https://pintwise.vsslog.dev
+- Pages URL: https://pintwise.pages.dev
+
+## Architecture
+
+```
+Browser (Cloudflare Pages static site)
+   │  fetch /api/pints, /api/pints/:id   (same origin)
+   ▼
+Pages Functions  (functions/api/…)  →  context.env.DB
+   ▼
+Cloudflare D1 (SQLite)
+```
+
+No database credentials are shipped to the browser — the client calls the
+same-origin `/api/*` routes, and only the server-side Functions touch D1.
 
 ## Setup Instructions
 
-### 1. Fork/Clone this Repository
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/yourusername/pintwise.git
+git clone https://github.com/vss96/pintwise.git
 cd pintwise
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
 ```
 
-### 3. Set up Supabase Database
-
-1. Sign up for [Supabase](https://supabase.com/)
-2. Create a new project
-3. Go to Settings → API to get your project URL and anon key
-4. In the SQL Editor, create the required table:
-
-```sql
-CREATE TABLE pint_entries (
-    id BIGSERIAL PRIMARY KEY,
-    debtor TEXT NOT NULL,
-    creditor TEXT NOT NULL,
-    description TEXT,
-    amount DECIMAL(10,2) DEFAULT 1.0,
-    date_created TIMESTAMPTZ DEFAULT NOW(),
-    date_paid TIMESTAMPTZ,
-    status TEXT DEFAULT 'pending'
-);
-
--- Disable Row Level Security for simplicity (or set up proper policies)
-ALTER TABLE pint_entries DISABLE ROW LEVEL SECURITY;
-```
-
-### 4. Configure GitHub Secrets
-
-1. Go to your GitHub repository
-2. Navigate to Settings → Secrets and variables → Actions
-3. Add new repository secrets:
-   - **Name**: `SUPABASE_URL` - **Value**: Your Supabase project URL
-   - **Name**: `SUPABASE_ANON_KEY` - **Value**: Your Supabase anon key
-
-### 5. Enable GitHub Pages
-
-1. Go to Settings → Pages
-2. Set Source to "GitHub Actions"
-3. The app will automatically deploy when you push to main branch
-
-### 6. Local Development
-
-For local development, create a `.env` file:
+### 2. Create the D1 database
 
 ```bash
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_anon_key_here
+npx wrangler login                 # one-time
+npx wrangler d1 create pintwise    # copy the database_id into wrangler.toml
+npx wrangler d1 execute pintwise --remote --file=schema.sql
+npx wrangler d1 execute pintwise --local  --file=schema.sql
 ```
 
-Then run:
+`wrangler.toml` binds the database to the `DB` binding used by the Functions.
+
+### 3. Local development
+
+Runs the static site + Pages Functions + a local D1 together:
 
 ```bash
-npm start
+npm run pages:dev      # build, then wrangler pages dev dist
 ```
+
+Open http://localhost:8788. (Seed the local D1 with `schema.sql` first — see
+above with `--local`.)
+
+`npm start` still runs the webpack dev server for pure UI work, but it does not
+serve the `/api/*` Functions, so use `npm run pages:dev` for full-stack testing.
+
+### 4. Deploy
+
+```bash
+npm run deploy         # build + wrangler pages deploy dist --project-name=pintwise
+```
+
+Or push to `main` — `.github/workflows/deploy-cloudflare-pages.yml` builds and
+deploys automatically. That workflow needs two repo secrets (Settings → Secrets
+and variables → Actions):
+
+- `CLOUDFLARE_API_TOKEN` — token with **Account → Cloudflare Pages → Edit**
+- `CLOUDFLARE_ACCOUNT_ID` — your Cloudflare account id
+
+### 5. Custom domain
+
+In the Cloudflare dashboard: Workers & Pages → **pintwise** → **Custom domains**
+→ add `pintwise.vsslog.dev`. If the zone is on Cloudflare, the CNAME and TLS
+cert are provisioned automatically.
 
 ## How to Use
 
@@ -99,34 +101,45 @@ npm start
 
 ### Search and Filter
 
-Use the search bar to find entries by:
-- Person names (debtor or creditor)
-- Description text
+Use the search bar to find entries by person names (debtor or creditor) or
+description text.
 
 ## Database Schema
 
-The app uses a PostgreSQL table in Supabase:
+D1 (SQLite) table, defined in [`schema.sql`](schema.sql):
 
 ```sql
-CREATE TABLE pint_entries (
-    id BIGSERIAL PRIMARY KEY,
-    debtor TEXT NOT NULL,
-    creditor TEXT NOT NULL,
-    description TEXT,
-    amount DECIMAL(10,2) DEFAULT 1.0,
-    date_created TIMESTAMPTZ DEFAULT NOW(),
-    date_paid TIMESTAMPTZ,
-    status TEXT DEFAULT 'pending'
+CREATE TABLE IF NOT EXISTS pint_entries (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    debtor       TEXT NOT NULL,
+    creditor     TEXT NOT NULL,
+    description  TEXT DEFAULT '',
+    amount       REAL NOT NULL DEFAULT 1.0,
+    date_created TEXT,   -- ISO-8601 UTC
+    date_paid    TEXT,   -- ISO-8601 UTC, nullable
+    status       TEXT NOT NULL DEFAULT 'pending'
 );
 ```
+
+## API
+
+| Method | Route              | Purpose                          |
+|--------|--------------------|----------------------------------|
+| GET    | `/api/pints`       | List all (`?status=pending` filter) |
+| POST   | `/api/pints`       | Add an entry                     |
+| PATCH  | `/api/pints/:id`   | Mark an entry paid               |
+| DELETE | `/api/pints/:id`   | Delete an entry                  |
+
+> **Note:** the API is currently unauthenticated (same posture as the previous
+> Supabase RLS-allow-all setup). See `MIGRATION.md` for hardening options.
 
 ## Technology Stack
 
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
-- **Database**: Supabase (PostgreSQL)
+- **API**: Cloudflare Pages Functions
+- **Database**: Cloudflare D1 (SQLite)
 - **Build Tool**: Webpack
-- **Deployment**: GitHub Actions + GitHub Pages
-- **Styling**: Custom CSS with responsive design and scrollable lists
+- **Deployment**: Cloudflare Pages (GitHub Actions + wrangler)
 
 ## Contributing
 
@@ -144,20 +157,16 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 If you encounter any issues:
 
-1. Check that your Supabase URL and anon key are correct
-2. Ensure the GitHub secrets are properly set
-3. Verify that GitHub Pages is enabled
-4. Check the browser console for error messages
-5. Make sure the `pint_entries` table exists in your Supabase database
-6. Verify that Row Level Security is disabled or proper policies are set
+1. Confirm `wrangler.toml` has the correct `database_id` and `DB` binding
+2. Ensure the `pint_entries` table exists: `wrangler d1 execute pintwise --remote --command "SELECT count(*) FROM pint_entries"`
+3. For CI deploys, verify the `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets
+4. Check the browser console and `wrangler pages deployment tail` for errors
 
 ## Roadmap
 
-- [ ] Export/import functionality
-- [ ] User authentication
+- [ ] Authentication / access control
 - [ ] Group management
 - [ ] Email notifications
-- [ ] Mobile app version
 - [ ] Integration with payment apps
 
 ---
