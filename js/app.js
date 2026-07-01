@@ -134,8 +134,8 @@ class PintApp {
       <div class="pint-entry" data-id="${entry.id}">
         <div class="pint-info">
           <div class="pint-people">
-            <strong>${this.escapeHtml(entry.debtor)}</strong> owes
-            <strong>${this.escapeHtml(entry.creditor)}</strong>
+            ${this.avatar(entry.debtor)} <strong>${this.escapeHtml(entry.debtor)}</strong> owes
+            ${this.avatar(entry.creditor)} <strong>${this.escapeHtml(entry.creditor)}</strong>
           </div>
           <div class="pint-details">
             ${entry.amount} pint${entry.amount !== 1 ? 's' : ''}
@@ -168,8 +168,8 @@ class PintApp {
       <div class="pint-entry ${entry.status}" data-id="${entry.id}">
         <div class="pint-info">
           <div class="pint-people">
-            <strong>${this.escapeHtml(entry.debtor)}</strong> owes
-            <strong>${this.escapeHtml(entry.creditor)}</strong>
+            ${this.avatar(entry.debtor)} <strong>${this.escapeHtml(entry.debtor)}</strong> owes
+            ${this.avatar(entry.creditor)} <strong>${this.escapeHtml(entry.creditor)}</strong>
           </div>
           <div class="pint-details">
             ${entry.amount} pint${entry.amount !== 1 ? 's' : ''}
@@ -201,8 +201,8 @@ class PintApp {
     container.innerHTML = netBalances.map(balance => `
       <div class="balance-entry">
         <div class="balance-info">
-          <strong>${this.escapeHtml(balance.debtor)}</strong> owes
-          <strong>${this.escapeHtml(balance.creditor)}</strong>
+          ${this.avatar(balance.debtor)} <strong>${this.escapeHtml(balance.debtor)}</strong> owes
+          ${this.avatar(balance.creditor)} <strong>${this.escapeHtml(balance.creditor)}</strong>
         </div>
         <div class="balance-amount">
           ${balance.amount.toFixed(1)} pint${balance.amount !== 1 ? 's' : ''}
@@ -343,8 +343,8 @@ class PintApp {
         <div class="pint-entry" data-id="${entry.id}">
           <div class="pint-info">
             <div class="pint-people">
-              <strong>${this.escapeHtml(entry.debtor)}</strong> owes
-              <strong>${this.escapeHtml(entry.creditor)}</strong>
+              ${this.avatar(entry.debtor)} <strong>${this.escapeHtml(entry.debtor)}</strong> owes
+              ${this.avatar(entry.creditor)} <strong>${this.escapeHtml(entry.creditor)}</strong>
             </div>
             <div class="pint-details">
               ${entry.amount} pint${entry.amount !== 1 ? 's' : ''}
@@ -367,8 +367,8 @@ class PintApp {
         <div class="pint-entry ${entry.status}" data-id="${entry.id}">
           <div class="pint-info">
             <div class="pint-people">
-              <strong>${this.escapeHtml(entry.debtor)}</strong> owes
-              <strong>${this.escapeHtml(entry.creditor)}</strong>
+              ${this.avatar(entry.debtor)} <strong>${this.escapeHtml(entry.debtor)}</strong> owes
+              ${this.avatar(entry.creditor)} <strong>${this.escapeHtml(entry.creditor)}</strong>
             </div>
             <div class="pint-details">
               ${entry.amount} pint${entry.amount !== 1 ? 's' : ''}
@@ -444,6 +444,16 @@ class PintApp {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  avatar(name) {
+    const safe = (name || '').trim();
+    const initial = safe ? safe.charAt(0).toUpperCase() : '?';
+    let hash = 0;
+    for (let i = 0; i < safe.length; i++) {
+      hash = (hash * 31 + safe.charCodeAt(i)) >>> 0;
+    }
+    return `<span class="avatar" style="--h:${hash % 360}" title="${this.escapeHtml(safe)}">${this.escapeHtml(initial)}</span>`;
   }
 }
 

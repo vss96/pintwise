@@ -25,12 +25,12 @@ html {
  */
 
 ::-moz-selection {
-  background: #b3d4fc;
+  background: #f3d69b;
   text-shadow: none;
 }
 
 ::selection {
-  background: #b3d4fc;
+  background: #f3d69b;
   text-shadow: none;
 }
 
@@ -81,22 +81,61 @@ textarea {
 }
 
 /* ==========================================================================
-   Author's custom styles
+   Author's custom styles — Pintwise "amber ale + dark roast" theme
    ========================================================================== */
 
-/* Pintwise App Styles */
 :root {
-  --primary-color: #3498db;
-  --secondary-color: #2c3e50;
-  --success-color: #27ae60;
-  --danger-color: #e74c3c;
-  --warning-color: #f39c12;
-  --light-bg: #ecf0f1;
-  --border-color: #bdc3c7;
-  --text-color: #2c3e50;
-  --text-muted: #7f8c8d;
-  --shadow: 0 2px 4px rgba(0,0,0,0.1);
-  --border-radius: 8px;
+  /* Light mode: amber ale + cream foam */
+  --bg: #fbf6ec;
+  --surface: #fffdf8;
+  --surface-2: #f5eedd;
+  --primary: #b8741a;        /* amber ale */
+  --primary-strong: #9a5e12;
+  --accent: #e0a82e;         /* gold head */
+  --roast: #2b1d12;          /* dark roast brown — headings & nav */
+  --on-dark: #fff8ec;        /* cream text on dark surfaces */
+  --text: #2a211a;
+  --muted: #7a6a57;
+  --success: #3f8f5b;        /* hoppy green */
+  --success-bg: #e4f1e7;
+  --danger: #b4442f;         /* brick red */
+  --pending-bg: #fbeac8;
+  --pending-fg: #8a5a12;
+  --border: #e7dac1;
+  --border-strong: #d9c6a3;
+  --foam: #f3e9d2;
+  --shadow: 0 2px 8px rgba(43, 29, 18, 0.08);
+  --shadow-lg: 0 10px 30px rgba(43, 29, 18, 0.14);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --focus-ring: 0 0 0 3px rgba(184, 116, 26, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode: late-night stout */
+    --bg: #171009;
+    --surface: #241910;
+    --surface-2: #2e2113;
+    --primary: #e7a93b;
+    --primary-strong: #f0be55;
+    --accent: #f0be55;
+    --roast: #f3e7d3;        /* light so headings/nav read on dark */
+    --on-dark: #fff8ec;
+    --text: #f3e7d3;
+    --muted: #b09a7e;
+    --success: #5fb07a;
+    --success-bg: #1e3226;
+    --danger: #d66a54;
+    --pending-bg: #3a2a12;
+    --pending-fg: #e7a93b;
+    --border: #3a2b1a;
+    --border-strong: #4a3824;
+    --foam: #2e2113;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --focus-ring: 0 0 0 3px rgba(231, 169, 59, 0.28);
+  }
 }
 
 * {
@@ -104,29 +143,43 @@ textarea {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: var(--light-bg);
-  color: var(--text-color);
+  background-color: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app-container {
-  max-width: 1200px;
+  max-width: 1040px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: white;
-  box-shadow: var(--shadow);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Header Styles */
+/* Header */
 .app-header {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: white;
-  padding: 1rem;
-  box-shadow: var(--shadow);
+  position: relative;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--roast) 115%);
+  color: var(--on-dark);
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+/* Foam scallop under the header */
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 12px;
+  background: radial-gradient(circle at 12px 0, var(--bg) 7px, transparent 7.5px) repeat-x;
+  background-size: 24px 12px;
 }
 
 .header-content {
@@ -139,98 +192,127 @@ body {
 
 .app-title {
   margin: 0;
-  font-size: 1.8rem;
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
   font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .header-stats {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 
 .stat {
+  background: rgba(255, 248, 236, 0.14);
+  border: 1px solid rgba(255, 248, 236, 0.22);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
   text-align: center;
 }
 
 .stat-label {
   display: block;
-  font-size: 0.8rem;
-  opacity: 0.9;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
 }
 
 .stat-value {
   display: block;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
-/* Navigation Styles */
+/* Navigation */
 .app-nav {
   display: flex;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   overflow-x: auto;
+  padding: 0 0.5rem;
 }
 
 .nav-btn {
   flex: 1;
-  padding: 1rem;
+  padding: 0.9rem 1rem;
   border: none;
-  background: white;
-  color: var(--text-color);
+  background: transparent;
+  color: var(--muted);
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
   white-space: nowrap;
+  position: relative;
 }
 
 .nav-btn:hover {
-  background: var(--light-bg);
+  color: var(--text);
 }
 
 .nav-btn.active {
-  background: var(--primary-color);
-  color: white;
+  color: var(--roast);
 }
 
-/* Search Styles */
+.nav-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -1px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Search */
 .search-container {
-  padding: 1rem;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 
 .search-input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input::placeholder {
+  color: var(--muted);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
 }
 
-/* Loading Styles */
+/* Loading */
 .loading {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 2rem;
-  color: var(--text-muted);
+  color: var(--muted);
 }
 
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid var(--border-color);
-  border-top: 2px solid var(--primary-color);
+  border: 2px solid var(--border-strong);
+  border-top: 2px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -240,143 +322,191 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Main Content Styles */
+/* Main content */
 .app-main {
   flex: 1;
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
 .view-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .view-header h2 {
-  margin: 0 0 0.5rem 0;
-  color: var(--secondary-color);
+  margin: 0 0 0.25rem 0;
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--roast);
 }
 
 .view-header p {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--muted);
 }
 
-/* Button Styles */
+/* Buttons */
 .btn {
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.1rem;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: 999px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
+  font-weight: 600;
+  font-family: inherit;
+  transition: transform 0.06s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  line-height: 1;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .btn-primary {
-  background: var(--primary-color);
-  color: white;
+  background: var(--primary);
+  color: var(--on-dark);
 }
 
 .btn-primary:hover {
-  background: #2980b9;
+  background: var(--primary-strong);
 }
 
 .btn-secondary {
-  background: var(--secondary-color);
-  color: white;
+  background: rgba(255, 248, 236, 0.16);
+  color: var(--on-dark);
+  border: 1px solid rgba(255, 248, 236, 0.28);
 }
 
 .btn-secondary:hover {
-  background: #34495e;
+  background: rgba(255, 248, 236, 0.26);
 }
 
 .btn-success {
-  background: var(--success-color);
-  color: white;
+  background: var(--success);
+  color: #fff;
 }
 
 .btn-success:hover {
-  background: #229954;
+  filter: brightness(1.06);
 }
 
 .btn-danger {
-  background: var(--danger-color);
-  color: white;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
 }
 
 .btn-danger:hover {
-  background: #c0392b;
+  background: var(--danger);
+  color: #fff;
 }
 
-/* Pint Entry Styles */
+/* Pint & balance lists */
 .pint-list, .balance-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  max-height: 60vh;
+  gap: 0.85rem;
+  max-height: 62vh;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 0.4rem;
 }
 
-/* Custom scrollbar styling */
 .pint-list::-webkit-scrollbar, .balance-list::-webkit-scrollbar {
   width: 8px;
 }
 
 .pint-list::-webkit-scrollbar-track, .balance-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
 
 .pint-list::-webkit-scrollbar-thumb, .balance-list::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--border-strong);
   border-radius: 4px;
 }
 
 .pint-list::-webkit-scrollbar-thumb:hover, .balance-list::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--primary);
 }
 
+/* Pint entry cards */
 .pint-entry {
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .pint-entry:hover {
   box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .pint-entry.paid {
-  opacity: 0.7;
-  background: #f8f9fa;
+  border-left-color: var(--success);
+  background: var(--surface-2);
+}
+
+.pint-entry.paid .pint-people {
+  color: var(--muted);
 }
 
 .pint-info {
   flex: 1;
+  min-width: 0;
 }
 
 .pint-people {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+  margin-bottom: 0.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.pint-people strong {
+  font-weight: 700;
+}
+
+/* Initial avatars */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: hsl(var(--h, 30) 52% 42%);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
 }
 
 .pint-details {
-  color: var(--text-muted);
+  color: var(--muted);
   margin-bottom: 0.25rem;
 }
 
 .pint-date {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.82rem;
+  color: var(--muted);
 }
 
 .pint-actions {
@@ -391,106 +521,130 @@ body {
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .status-badge.pending {
-  background: #fff3cd;
-  color: #856404;
+  background: var(--pending-bg);
+  color: var(--pending-fg);
 }
 
 .status-badge.paid {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-bg);
+  color: var(--success);
 }
 
-/* Balance Entry Styles */
+/* Balance entries */
 .balance-entry {
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .balance-info {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .balance-amount {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
 }
 
-/* Form Styles */
+.balance-amount::after {
+  content: " 🍺";
+}
+
+/* Add-pint form */
 .add-pint-form {
-  max-width: 500px;
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 1.5rem;
+  box-shadow: var(--shadow);
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--secondary-color);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--roast);
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
 }
 
-/* Empty State */
+.add-pint-form .btn-primary {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+/* Empty state */
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: var(--text-muted);
+  color: var(--muted);
   font-size: 1.1rem;
 }
 
-/* Message Styles */
+/* Toast messages */
 .message {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 1rem 1.5rem;
-  border-radius: var(--border-radius);
-  color: white;
-  font-weight: 500;
+  padding: 0.9rem 1.3rem;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-weight: 600;
   z-index: 1000;
+  box-shadow: var(--shadow-lg);
   animation: slideIn 0.3s ease;
 }
 
 .message.success {
-  background: var(--success-color);
+  background: var(--success);
 }
 
 .message.error {
-  background: var(--danger-color);
+  background: var(--danger);
 }
 
 @keyframes slideIn {
@@ -506,20 +660,21 @@ body {
 
 /* Footer */
 .app-footer {
-  background: var(--light-bg);
+  background: var(--surface-2);
   padding: 1rem;
   text-align: center;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border-color);
+  color: var(--muted);
+  border-top: 1px solid var(--border);
   margin-top: auto;
+  font-size: 0.9rem;
 }
 
-/* Utility Classes */
+/* Utility */
 .hidden {
   display: none !important;
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
@@ -533,47 +688,47 @@ body {
   .pint-entry {
     flex-direction: column;
     align-items: stretch;
-    text-align: center;
+    text-align: left;
   }
 
   .pint-actions {
-    justify-content: center;
-    margin-top: 1rem;
+    justify-content: flex-start;
+    margin-top: 0.75rem;
   }
 
   .balance-entry {
     flex-direction: column;
-    text-align: center;
+    align-items: flex-start;
     gap: 0.5rem;
   }
 
   .app-nav {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .nav-btn {
-    min-width: 120px;
+    min-width: 110px;
   }
 }
 
 @media (max-width: 480px) {
   .app-main {
-    padding: 0.5rem;
-  }
-
-  .pint-entry, .balance-entry, .add-pint-form {
     padding: 0.75rem;
   }
 
+  .pint-entry, .balance-entry, .add-pint-form {
+    padding: 0.9rem;
+  }
+
   .header-stats {
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .pint-actions {
     flex-direction: column;
   }
 
-  .btn {
+  .pint-actions .btn {
     width: 100%;
   }
 }
@@ -656,23 +811,6 @@ body {
 }
 
 /* ==========================================================================
-   EXAMPLE Media Queries for Responsive Design.
-   These examples override the primary ('mobile first') styles.
-   Modify as content requires.
-   ========================================================================== */
-
-@media only screen and (min-width: 35em) {
-  /* Style adjustments for viewports that meet the condition */
-}
-
-@media print,
-  (-webkit-min-device-pixel-ratio: 1.25),
-  (min-resolution: 1.25dppx),
-  (min-resolution: 120dpi) {
-  /* Style adjustments for high resolution devices */
-}
-
-/* ==========================================================================
    Print styles.
    Inlined to avoid the additional HTTP request:
    https://www.phpied.com/delay-loading-your-print-css/
@@ -738,4 +876,3 @@ body {
     page-break-after: avoid;
   }
 }
-
