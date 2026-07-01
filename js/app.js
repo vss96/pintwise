@@ -453,7 +453,7 @@ class PintApp {
     for (let i = 0; i < safe.length; i++) {
       hash = (hash * 31 + safe.charCodeAt(i)) >>> 0;
     }
-    return `<span class="avatar" style="--h:${hash % 360}" title="${this.escapeHtml(safe)}">${this.escapeHtml(initial)}</span>`;
+    return `<span class="avatar" style="--h:${hash % 360}">${this.escapeHtml(initial)}</span>`;
   }
 }
 
