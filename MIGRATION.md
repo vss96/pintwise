@@ -22,7 +22,7 @@ Pages Functions + D1 (SQLite). Design and plan live under
 
 - **D1 database:** `pintwise` (id `71a046a7-55e1-4aa3-9aed-109637e7e910`, region WEUR)
 - **Pages project:** `pintwise` (production branch `main`, `pintwise.pages.dev`)
-- **Custom domain:** `pintwise.vsslog.dev`
+- **Custom domain:** none — served from `pintwise.pages.dev`
 
 ## Commands that were run
 
@@ -46,10 +46,10 @@ wrangler pages project create pintwise --production-branch=main
 npm run deploy    # build + wrangler pages deploy dist --project-name=pintwise
 ```
 
-### Custom domain (done in the Cloudflare dashboard)
+### Custom domain
 
-Workers & Pages → **pintwise** → **Custom domains** → add `pintwise.vsslog.dev`.
-Cloudflare auto-creates the CNAME in the `vsslog.dev` zone and provisions TLS.
+Not configured — the app is served from `pintwise.pages.dev`. A custom domain
+can be added later via Workers & Pages → **pintwise** → **Custom domains**.
 
 ## Remaining / operational notes
 

@@ -13,8 +13,7 @@ Cloudflare Pages with a Pages Functions API backed by Cloudflare D1 (SQLite).
 
 ## Live Demo
 
-- Production: https://pintwise.vsslog.dev
-- Pages URL: https://pintwise.pages.dev
+Live at https://pintwise.pages.dev
 
 ## Architecture
 
@@ -78,11 +77,12 @@ and variables → Actions):
 - `CLOUDFLARE_API_TOKEN` — token with **Account → Cloudflare Pages → Edit**
 - `CLOUDFLARE_ACCOUNT_ID` — your Cloudflare account id
 
-### 5. Custom domain
+### 5. Custom domain (optional)
 
-In the Cloudflare dashboard: Workers & Pages → **pintwise** → **Custom domains**
-→ add `pintwise.vsslog.dev`. If the zone is on Cloudflare, the CNAME and TLS
-cert are provisioned automatically.
+The app is served from `pintwise.pages.dev`. To use a custom domain, in the
+Cloudflare dashboard go to Workers & Pages → **pintwise** → **Custom domains**
+and add it; if the zone is on Cloudflare, the CNAME and TLS cert are
+provisioned automatically.
 
 ## How to Use
 
