@@ -12,7 +12,7 @@
   "license": "MIT",
   "author": "Pintwise Team",
   "scripts": {
-    "test": "node --test scripts/",
+    "test": "node --test scripts/*.test.mjs",
     "start": "webpack serve --open --config webpack.config.dev.js",
     "build": "webpack --config webpack.config.prod.js",
     "pages:dev": "npm run build && wrangler pages dev dist",
